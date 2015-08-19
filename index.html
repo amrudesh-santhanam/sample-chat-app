@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      #name { background: #000; padding: 3px; width: 100%; }
+      #name label { border: 0; padding: 10px; width: 20%; margin-right: .5%; color: white; }
+      #name input { border: 0; padding: 10px; width: 50%; margin-right: .5%; }
+      #name button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #msg { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+      #msg input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      #msg button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+      #messages { list-style-type: none; margin: 100; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+
+    <form action="" id="name">
+      <label>Type in your name</label>
+      <input id="nickname" autocomplete="off" />
+      <button>Set name</button>
+      <label id="my_name"></label>
+    </form>
+    <ul id="messages"></ul>
+    <form action="" id="msg">
+      <input id="m" autocomplete="off" />
+      <button>Send</button>
+    </form>
+
+    <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+      var myName = "";
+      $('#name').submit(function(){
+        myName = $('#nickname').val();
+        socket.emit('user name set', myName);
+        $('#my_name').text(myName);
+        return false;
+      });
+      $('#msg').submit(function(){
+        var new_message = $('#m').val();
+        $('#messages').append($('<li>').text('me: ' + new_message));
+        var message_object = {'name': myName, 'message': new_message};
+        socket.emit('chat_message', message_object );
+        $('#m').val('');
+        return false;
+      });
+      socket.on('chat_message', function (message){
+        var text_to_display = message.name + ': ' + message.message;
+        $('#messages').append($('<li>').text(text_to_display));
+      });
+    </script>
+
+  </body>
+</html>
